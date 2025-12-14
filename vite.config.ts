@@ -2,7 +2,7 @@
   import { defineConfig } from 'vite';
   import react from '@vitejs/plugin-react-swc';
   import path from 'path';
-  import { copyFileSync, existsSync, writeFileSync } from 'fs';
+  import { copyFileSync, existsSync, readFileSync, writeFileSync } from 'fs';
   import { fileURLToPath } from 'url';
 
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -23,6 +23,33 @@
             writeFileSync(distPath, '');
           }
           console.log('.nojekyll file created in dist/');
+        },
+      },
+      {
+        name: 'verify-html-transformation',
+        closeBundle() {
+          const distHtmlPath = path.resolve(__dirname, 'dist', 'index.html');
+          if (existsSync(distHtmlPath)) {
+            const htmlContent = readFileSync(distHtmlPath, 'utf-8');
+            
+            // Check if HTML still contains /src/ references
+            if (htmlContent.includes('src="/src/') || htmlContent.includes("src='/src/")) {
+              console.error('ERROR: HTML still contains /src/ references!');
+              console.error('This means Vite did not transform the HTML properly.');
+              console.error('HTML content:');
+              console.error(htmlContent);
+              throw new Error('Build failed: HTML transformation did not work. HTML still references /src/ files.');
+            }
+            
+            // Verify that script tags reference /assets/ files
+            if (!htmlContent.includes('src="/assets/') && !htmlContent.includes("src='/assets/")) {
+              console.warn('WARNING: No /assets/ references found in HTML');
+            } else {
+              console.log('✓ HTML transformation verified: Scripts reference /assets/ files');
+            }
+          } else {
+            throw new Error('Build failed: dist/index.html not found');
+          }
         },
       },
     ],
@@ -82,20 +109,9 @@
       rollupOptions: {
         output: {
           manualChunks: undefined,
-          entryFileNames: (chunkInfo) => {
-            return `assets/${chunkInfo.name}-[hash].js`;
-          },
-          chunkFileNames: (chunkInfo) => {
-            return `assets/${chunkInfo.name}-[hash].js`;
-          },
-          assetFileNames: (assetInfo) => {
-            const info = assetInfo.name.split('.');
-            const ext = info[info.length - 1];
-            if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(ext)) {
-              return `assets/[name]-[hash][extname]`;
-            }
-            return `assets/[name]-[hash][extname]`;
-          },
+          entryFileNames: 'assets/[name]-[hash].js',
+          chunkFileNames: 'assets/[name]-[hash].js',
+          assetFileNames: 'assets/[name]-[hash].[ext]',
           format: 'es',
         },
       },

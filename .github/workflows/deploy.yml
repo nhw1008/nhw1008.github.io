@@ -65,16 +65,34 @@ jobs:
             cat dist/index.html
             echo ""
             echo "=== Checking for .tsx references ==="
-            if grep -q "src=\"/src/" dist/index.html || grep -q "src='/src/" dist/index.html; then
-              echo "WARNING: Found /src/ reference in HTML - this should be transformed!"
-              grep -n "src=" dist/index.html
+            if grep -q "src=\"/src/" dist/index.html || grep -q "src='/src/" dist/index.html || grep -q "\.tsx" dist/index.html; then
+              echo "❌ ERROR: Found /src/ or .tsx reference in HTML - Vite did not transform the entry point!"
+              echo "This will cause 'application/octet-stream' MIME type errors on GitHub Pages."
+              echo ""
+              echo "Problematic lines:"
+              grep -n "src=" dist/index.html | grep -E "(src|tsx)" || grep -n "\.tsx" dist/index.html
+              echo ""
+              echo "Expected: Scripts should reference /assets/*.js files, not /src/*.tsx files"
               exit 1
             else
-              echo "✓ No /src/ references found - HTML is properly transformed"
+              echo "✓ No /src/ or .tsx references found - HTML is properly transformed"
             fi
             echo ""
             echo "=== Checking script tags ==="
-            grep -n "<script" dist/index.html || echo "No script tags found"
+            if grep -q "<script" dist/index.html; then
+              echo "Script tags found:"
+              grep -n "<script" dist/index.html
+              echo ""
+              echo "Verifying script paths:"
+              if grep -q "src=\"/assets/" dist/index.html || grep -q "src='/assets/" dist/index.html; then
+                echo "✓ Scripts correctly reference /assets/ directory"
+              else
+                echo "⚠ WARNING: No /assets/ references found in script tags"
+              fi
+            else
+              echo "❌ ERROR: No script tags found in HTML!"
+              exit 1
+            fi
           else
             echo "ERROR: index.html not found!"
             exit 1
@@ -86,13 +104,31 @@ jobs:
           ls -la dist/
           echo ""
           echo "=== Assets directory ==="
-          ls -la dist/assets/ || echo "No assets directory"
+          if [ -d dist/assets/ ]; then
+            echo "Assets directory exists with files:"
+            ls -lh dist/assets/ | head -20
+            echo ""
+            echo "JavaScript files in assets:"
+            find dist/assets -name "*.js" -type f | head -10
+            JS_COUNT=$(find dist/assets -name "*.js" -type f | wc -l)
+            echo "Total JS files: $JS_COUNT"
+            if [ "$JS_COUNT" -eq 0 ]; then
+              echo "❌ ERROR: No JavaScript files found in dist/assets/"
+              exit 1
+            fi
+          else
+            echo "❌ ERROR: dist/assets/ directory not found!"
+            echo "This means the build did not generate any assets."
+            exit 1
+          fi
           echo ""
-          echo "=== Verifying JavaScript files ==="
-          find dist -name "*.js" -type f | head -10
-          echo ""
-          echo "=== File permissions ==="
-          find dist -name "*.js" -type f -exec ls -lh {} \; | head -5
+          echo "=== Verifying build output structure ==="
+          if [ -f dist/index.html ] && [ -d dist/assets/ ]; then
+            echo "✓ Build output structure looks correct"
+          else
+            echo "❌ ERROR: Build output structure is invalid"
+            exit 1
+          fi
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
