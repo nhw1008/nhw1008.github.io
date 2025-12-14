@@ -2,10 +2,29 @@
   import { defineConfig } from 'vite';
   import react from '@vitejs/plugin-react-swc';
   import path from 'path';
+  import { copyFileSync, existsSync, writeFileSync } from 'fs';
+  import { fileURLToPath } from 'url';
+
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
   export default defineConfig({
     base: '/',
-    plugins: [react()],
+    plugins: [
+      react(),
+      {
+        name: 'copy-nojekyll',
+        closeBundle() {
+          const nojekyllPath = path.resolve(__dirname, '.nojekyll');
+          const distPath = path.resolve(__dirname, 'dist', '.nojekyll');
+          if (existsSync(nojekyllPath)) {
+            copyFileSync(nojekyllPath, distPath);
+          } else {
+            // Create .nojekyll if it doesn't exist
+            writeFileSync(distPath, '');
+          }
+        },
+      },
+    ],
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
       alias: {
@@ -53,6 +72,17 @@
     build: {
       target: 'esnext',
       outDir: 'dist',
+      assetsDir: 'assets',
+      sourcemap: false,
+      minify: 'esbuild',
+      rollupOptions: {
+        output: {
+          manualChunks: undefined,
+          entryFileNames: 'assets/[name].[hash].js',
+          chunkFileNames: 'assets/[name].[hash].js',
+          assetFileNames: 'assets/[name].[hash].[ext]',
+        },
+      },
     },
     server: {
       port: 3000,
