@@ -36,10 +36,31 @@ jobs:
         run: npm run build
 
       - name: Copy .nojekyll to dist
-        run: cp .nojekyll dist/ || echo "" > dist/.nojekyll
+        run: |
+          if [ -f .nojekyll ]; then
+            cp .nojekyll dist/.nojekyll
+          else
+            touch dist/.nojekyll
+          fi
+
+      - name: Verify .nojekyll exists
+        run: |
+          if [ ! -f dist/.nojekyll ]; then
+            echo "ERROR: .nojekyll file not found in dist/"
+            exit 1
+          fi
+          echo ".nojekyll file verified"
 
       - name: List build output
-        run: ls -la dist/
+        run: |
+          echo "=== Root files ==="
+          ls -la dist/
+          echo ""
+          echo "=== Assets directory ==="
+          ls -la dist/assets/ || echo "No assets directory"
+          echo ""
+          echo "=== Verifying JavaScript files ==="
+          find dist -name "*.js" -type f | head -10
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

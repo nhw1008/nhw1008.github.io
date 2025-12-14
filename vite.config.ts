@@ -76,12 +76,13 @@
       sourcemap: false,
       minify: 'esbuild',
       modulePreload: false,
+      assetsInlineLimit: 0,
       rollupOptions: {
         output: {
           manualChunks: undefined,
-          entryFileNames: 'assets/[name].[hash].js',
-          chunkFileNames: 'assets/[name].[hash].js',
-          assetFileNames: 'assets/[name].[hash].[ext]',
+          entryFileNames: 'assets/[name]-[hash].js',
+          chunkFileNames: 'assets/[name]-[hash].js',
+          assetFileNames: 'assets/[name]-[hash].[ext]',
           format: 'es',
         },
       },
