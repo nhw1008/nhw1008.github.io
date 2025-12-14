@@ -22,6 +22,7 @@
             // Create .nojekyll if it doesn't exist
             writeFileSync(distPath, '');
           }
+          console.log('.nojekyll file created in dist/');
         },
       },
     ],
@@ -77,12 +78,24 @@
       minify: 'esbuild',
       modulePreload: false,
       assetsInlineLimit: 0,
+      cssCodeSplit: true,
       rollupOptions: {
         output: {
           manualChunks: undefined,
-          entryFileNames: 'assets/[name]-[hash].js',
-          chunkFileNames: 'assets/[name]-[hash].js',
-          assetFileNames: 'assets/[name]-[hash].[ext]',
+          entryFileNames: (chunkInfo) => {
+            return `assets/${chunkInfo.name}-[hash].js`;
+          },
+          chunkFileNames: (chunkInfo) => {
+            return `assets/${chunkInfo.name}-[hash].js`;
+          },
+          assetFileNames: (assetInfo) => {
+            const info = assetInfo.name.split('.');
+            const ext = info[info.length - 1];
+            if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(ext)) {
+              return `assets/[name]-[hash][extname]`;
+            }
+            return `assets/[name]-[hash][extname]`;
+          },
           format: 'es',
         },
       },

@@ -35,6 +35,11 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Create .nojekyll file
+        run: |
+          touch dist/.nojekyll
+          echo ".nojekyll file created"
+
       - name: Copy .nojekyll to dist
         run: |
           if [ -f .nojekyll ]; then
@@ -50,6 +55,17 @@ jobs:
             exit 1
           fi
           echo ".nojekyll file verified"
+          ls -la dist/.nojekyll
+
+      - name: Check generated HTML
+        run: |
+          echo "=== Checking index.html ==="
+          if [ -f dist/index.html ]; then
+            head -30 dist/index.html
+          else
+            echo "ERROR: index.html not found!"
+            exit 1
+          fi
 
       - name: List build output
         run: |
@@ -61,6 +77,9 @@ jobs:
           echo ""
           echo "=== Verifying JavaScript files ==="
           find dist -name "*.js" -type f | head -10
+          echo ""
+          echo "=== File permissions ==="
+          find dist -name "*.js" -type f -exec ls -lh {} \; | head -5
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
