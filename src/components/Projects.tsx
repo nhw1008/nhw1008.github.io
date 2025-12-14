@@ -1,6 +1,9 @@
 import React from 'react';
 import { Github } from 'lucide-react';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
+import img1 from '../img/img1.jpg';
+import img2 from '../img/img2.jpg';
+import img3 from '../img/img3.jpg';
 
 export function Projects() {
   const { ref, isVisible } = useScrollAnimation();
@@ -10,7 +13,7 @@ export function Projects() {
       description:
         '극장 검색, 영화 목록, 회원 관리 기능을 갖춘 영화 커뮤니티 웹서비스입니다. 바닐라 JS와 PHP, MySQL을 사용해 프론트엔드와 백엔드를 직접 설계/구현했습니다.',
       tags: ['JavaScript', 'Node.js', 'PHP', 'MySQL', 'REST API'],
-      image: 'https://images.unsplash.com/photo-1556155092-8707de31f9c4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZWFsdGltZSUyMGNoYXQlMjBhcHBsaWNhdGlvbnxlbnwxfHx8fDE3NjU3MTkyMzB8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+      image: img2,
       github: 'https://github.com/nhw1008/PhpCinepals',
     },
     {
@@ -18,7 +21,7 @@ export function Projects() {
       description:
         '개인 프로젝트로 기존 PHP/MySQL 구조를 React, TypeScript, Tailwind CSS, BaaS로 대체할 수 있는 서버리스 백엔드 아키텍처를 실습했습니다.',
       tags: ['React', 'TypeScript', 'Tailwind CSS', 'Supabase'],
-      image: 'https://images.unsplash.com/photo-1683721003111-070bcc053d8b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzb2NpYWwlMjBtZWRpYSUyMHBsYXRmb3JtfGVufDF8fHx8MTc2NTcxOTIzMHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+      image: img3,
       github: 'https://github.com/nhw1008/ReactTypeScriptCinepals',
     },
     {
@@ -26,7 +29,7 @@ export function Projects() {
       description:
         'Flutter로 구현한 모바일 여행 플래너 데모로, Google API와 연동해 목적지 정보를 가져오고 AI 프롬프트를 통해 일정 추천을 제공하는 프로토타입을 제작했습니다.',
       tags: ['Flutter', 'Dart', 'Node.js', 'Express', 'Gemini API', 'Perplexity API', 'Google API'],
-      image: 'https://images.unsplash.com/photo-1643116774075-acc00caa9a7b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhcGklMjBzZXJ2ZXIlMjBkZXZlbG9wbWVudHxlbnwxfHx8fDE3NjU3MTkyMzF8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+      image: img1,
       github: 'https://github.com/nhw1008/aitravelagency',
     },
     {
