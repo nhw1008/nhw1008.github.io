@@ -61,7 +61,20 @@ jobs:
         run: |
           echo "=== Checking index.html ==="
           if [ -f dist/index.html ]; then
-            head -30 dist/index.html
+            echo "Full index.html content:"
+            cat dist/index.html
+            echo ""
+            echo "=== Checking for .tsx references ==="
+            if grep -q "src=\"/src/" dist/index.html || grep -q "src='/src/" dist/index.html; then
+              echo "WARNING: Found /src/ reference in HTML - this should be transformed!"
+              grep -n "src=" dist/index.html
+              exit 1
+            else
+              echo "✓ No /src/ references found - HTML is properly transformed"
+            fi
+            echo ""
+            echo "=== Checking script tags ==="
+            grep -n "<script" dist/index.html || echo "No script tags found"
           else
             echo "ERROR: index.html not found!"
             exit 1
